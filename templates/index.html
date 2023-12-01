@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Stock Information: Daily Adjusted (by Alpha Vantage) With Flask</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>Stock Information: Daily Adjusted (by Alpha Vantage)</h1>
+        <div class="table-1">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Symbol</th>
+                        <th>Open</th>
+                        <th>High</th>
+                        <th>Low</th>
+                        <th>Close</th>
+                        <th>Adjusted Close</th>
+                        <th>Volume</th>
+                        <th>Dividend Amount</th>
+                        <th>Split Coefficient</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not stock_data_list %}
+                        <tr>
+                            <td colspan="10">No Results.</td>
+                        </tr>
+                    {% else %}
+                        {% for stock in stock_data_list %}
+                            <tr>
+                                <td data-th="Date">{{ stock.date }}</td>
+                                <td data-th="Symbol">{{ stock.symbol }}</td>
+                                <td data-th="Open">{{ stock.open }}</td>
+                                <td data-th="High">{{ stock.high }}</td>
+                                <td data-th="Low">{{ stock.low }}</td>
+                                <td data-th="Close">{{ stock.close }}</td>
+                                <td data-th="Adjusted Close">{{ stock.adjusted_close }}</td>
+                                <td data-th="Volume">{{ stock.volume }}</td>
+                                <td data-th="Dividend Amount">{{ stock.dividend_amount }}</td>
+                                <td data-th="Split Coefficient">{{ stock.split_coefficient }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
