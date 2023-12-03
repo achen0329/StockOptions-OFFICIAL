@@ -14,6 +14,17 @@
 <body>
     <div class="container">
         <h1>Stock Information: Daily Adjusted (by Alpha Vantage)</h1>
+
+          <!-- Search and Reload Form -->
+          <form method="post" style="display: inline;">
+            <input type="text" name="search_symbol" placeholder="Enter Stock Symbol (e.g., AAPL)">
+            <button type="submit">Search</button>
+        </form>
+        <form method="post" style="display: inline;">
+            <button type="submit" name="reload" value="true">Reload All</button>
+        </form>
+
+
         <div class="table-1">
             <table>
                 <thead>
@@ -33,21 +44,21 @@
                 <tbody>
                     {% if not stock_data_list %}
                         <tr>
-                            <td colspan="10">No Results.</td>
+                            <td colspan="10">No Results or Invalid Symbol.</td>
                         </tr>
                     {% else %}
                         {% for stock in stock_data_list %}
                             <tr>
-                                <td data-th="Date">{{ stock.date }}</td>
-                                <td data-th="Symbol">{{ stock.symbol }}</td>
-                                <td data-th="Open">{{ stock.open }}</td>
-                                <td data-th="High">{{ stock.high }}</td>
-                                <td data-th="Low">{{ stock.low }}</td>
-                                <td data-th="Close">{{ stock.close }}</td>
-                                <td data-th="Adjusted Close">{{ stock.adjusted_close }}</td>
-                                <td data-th="Volume">{{ stock.volume }}</td>
-                                <td data-th="Dividend Amount">{{ stock.dividend_amount }}</td>
-                                <td data-th="Split Coefficient">{{ stock.split_coefficient }}</td>
+                                <td>{{ stock.date }}</td>
+                                <td>{{ stock.symbol }}</td>
+                                <td>{{ stock.open }}</td>
+                                <td>{{ stock.high }}</td>
+                                <td>{{ stock.low }}</td>
+                                <td>{{ stock.close }}</td>
+                                <td>{{ stock.adjusted_close }}</td>
+                                <td>{{ stock.volume }}</td>
+                                <td>{{ stock.dividend_amount }}</td>
+                                <td>{{ stock.split_coefficient }}</td>
                             </tr>
                         {% endfor %}
                     {% endif %}
