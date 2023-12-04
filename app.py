@@ -100,7 +100,7 @@ def get_historical_stock_data(symbol):
         'function': 'TIME_SERIES_DAILY_ADJUSTED',
         'symbol': symbol,
         'apikey': ALPHA_VANTAGE_API_KEY,
-        'outputsize': 'full'  # 'full' for two weeks of data
+        'outputsize': 'full'
     }
 
     response = requests.get(base_url, params=params)
@@ -109,17 +109,26 @@ def get_historical_stock_data(symbol):
         raise AlphaVantageApiException(response.status_code)
 
     data = response.json()
-
-    two_weeks_ago = (datetime.now() - timedelta(weeks=2)).strftime('%Y-%m-%d')
     time_series = data.get('Time Series (Daily)', {})
     
-    historical_data = {date: details for date, details in time_series.items() if date >= two_weeks_ago}
+    two_weeks_ago = (datetime.now() - timedelta(weeks=2)).strftime('%Y-%m-%d')
+    last_10_days_data = {date: details for date, details in time_series.items() if date >= two_weeks_ago}
 
-    return {
+    # Sort the dates and get the last 10 trading days
+    sorted_dates = sorted(last_10_days_data.keys(), reverse=True)[:10]
+    last_10_days_data_sorted = [last_10_days_data[date] for date in sorted_dates]
+    
+    current_price = round(float(last_10_days_data_sorted[0]['4. close']), 2)
+    two_week_average = calculate_two_week_average(last_10_days_data_sorted)
+    
+    historical_data_with_averages = {
         'symbol': symbol,
-        'data': historical_data
+        'data': last_10_days_data,
+        'current_price': current_price,
+        'two_week_average': two_week_average
     }
 
+    return historical_data_with_averages
 
 
 
