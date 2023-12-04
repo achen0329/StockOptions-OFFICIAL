@@ -23,8 +23,38 @@
         <form method="post" style="display: inline;">
             <button type="submit" name="reload" value="true">Reload All</button>
         </form>
+        
+         <!-- Historical Data Table -->
+         {% if historical_data %}
+         <h2>Historical Data for {{ symbol }}</h2>
+         <div class="table-1">
+             <table>
+                 <thead>
+                     <tr>
+                         <th>Date</th>
+                         <th>Open</th>
+                         <th>High</th>
+                         <th>Low</th>
+                         <th>Close</th>
+                         <!-- More columns as needed -->
+                     </tr>
+                 </thead>
+                 <tbody>
+                     {% for date, data in historical_data['data'].items() %}
+                         <tr>
+                             <td>{{ date }}</td>
+                             <td>{{ data['1. open'] }}</td>
+                             <td>{{ data['2. high'] }}</td>
+                             <td>{{ data['3. low'] }}</td>
+                             <td>{{ data['4. close'] }}</td>
+                             <!-- More data as needed -->
+                         </tr>
+                     {% endfor %}
+                 </tbody>
+             </table>
+         </div>
 
-
+        {% elif stock_data_list %}
         <div class="table-1">
             <table>
                 <thead>
@@ -62,6 +92,11 @@
                 </tbody>
             </table>
         </div>
+
+        {% else %}
+            <!-- No data available -->
+            <p>No results or invalid symbol.</p>
+        {% endif %}
     </div>
 </body>
 

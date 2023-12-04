@@ -94,11 +94,40 @@ def get_stock_data(symbol):
     else:
         return None
 
+def get_historical_stock_data(symbol):
+    base_url = 'https://www.alphavantage.co/query'
+    params = {
+        'function': 'TIME_SERIES_DAILY_ADJUSTED',
+        'symbol': symbol,
+        'apikey': ALPHA_VANTAGE_API_KEY,
+        'outputsize': 'full'  # 'full' for two weeks of data
+    }
+
+    response = requests.get(base_url, params=params)
+    
+    if response.status_code != 200:
+        raise AlphaVantageApiException(response.status_code)
+
+    data = response.json()
+
+    two_weeks_ago = (datetime.now() - timedelta(weeks=2)).strftime('%Y-%m-%d')
+    time_series = data.get('Time Series (Daily)', {})
+    
+    historical_data = {date: details for date, details in time_series.items() if date >= two_weeks_ago}
+
+    return {
+        'symbol': symbol,
+        'data': historical_data
+    }
+
+
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     stock_data_list = []
+    historical_data = None
+    search_symbol = None  # Initialize the variable
 
     if request.method == 'POST':
         if 'reload' in request.form:
@@ -115,11 +144,12 @@ def index():
             search_symbol = request.form.get('search_symbol').upper()
             if search_symbol in available_stocks:
                 try:
-                    stock_data = get_stock_data(search_symbol)
-                    if stock_data:
-                        stock_data_list.append(stock_data)
+                    # Fetch historical data for the specific stock symbol
+                    historical_data = get_historical_stock_data(search_symbol)
                 except AlphaVantageApiException as e:
                     print(e)
+        return render_template('index.html', stock_data_list=stock_data_list, historical_data=historical_data, symbol=search_symbol)
+
     else:
         # Initial page load with all stocks
         for symbol in available_stocks:
