@@ -35,10 +35,9 @@
                         <th>High</th>
                         <th>Low</th>
                         <th>Close</th>
-                        <th>Adjusted Close</th>
-                        <th>Volume</th>
-                        <th>Dividend Amount</th>
-                        <th>Split Coefficient</th>
+                        <th>Current Price</th>
+                        <th>Two Week Average</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -55,10 +54,8 @@
                                 <td>{{ stock.high }}</td>
                                 <td>{{ stock.low }}</td>
                                 <td>{{ stock.close }}</td>
-                                <td>{{ stock.adjusted_close }}</td>
-                                <td>{{ stock.volume }}</td>
-                                <td>{{ stock.dividend_amount }}</td>
-                                <td>{{ stock.split_coefficient }}</td>
+                                <td>{{ stock.current_price }}</td>
+                                <td>{{ stock.two_week_average }}</td>
                             </tr>
                         {% endfor %}
                     {% endif %}
