@@ -115,7 +115,7 @@ def get_historical_stock_data(symbol):
         'symbol': symbol,
         'apikey': ALPHA_VANTAGE_API_KEY,
         'outputsize': 'full'
-
+    }
 
     response = requests.get(base_url, params=params)
     
