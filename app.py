@@ -4,6 +4,20 @@ from datetime import datetime, timedelta
 from config import ALPHA_VANTAGE_API_KEY
 from repos.exceptions import AlphaVantageApiException  # Import the exception class
 
+###################################################
+# Stock real time data to MongonDB Compass
+import pymongo
+
+myClient = pymongo.MongoClient("mongodb://localhost:27017/")
+myStockDBName = myClient["stockDataBase"]
+
+myStockDB2Week = myStockDBName["historical2WeekData"]
+myStockDBDaily = myStockDBName["dailyData"]
+
+# End of Stock real time data to MongonDB Compass
+###################################################
+
+
 app = Flask(__name__)
 
 # Define the available stocks to be displayed
@@ -137,38 +151,78 @@ def index():
     stock_data_list = []
     historical_data = None
     search_symbol = None  # Initialize the variable
-
+    
+    # reload the first page of the flask to get all stock deaily data
     if request.method == 'POST':
         if 'reload' in request.form:
             # Reload all stocks
             for symbol in available_stocks:
+                ###################################################
                 try:
-                    stock_data = get_stock_data(symbol)
-                    if stock_data:
-                        stock_data_list.append(stock_data)
+                    # read data from MongoDB Compass 
+                    onlineStockDailyData = myStockDBDaily.find_one({"symbol": symbol})  # read daily data
+                    if onlineStockDailyData:
+                        # put daily data into list
+                        stock_data_list.append(onlineStockDailyData)
+                    else:
+                        break
+
                 except AlphaVantageApiException as e:
                     print(e)
+                ###################################################
         else:
             # Search for specific stock symbol
             search_symbol = request.form.get('search_symbol').upper()
             if search_symbol in available_stocks:
                 try:
+                    ###################################################
                     # Fetch historical data for the specific stock symbol
-                    historical_data = get_historical_stock_data(search_symbol)
+                    historical_data = myStockDB2Week.find_one({"symbol": search_symbol})    # from MongoDB Compass data
+                    ###################################################
+
                 except AlphaVantageApiException as e:
                     print(e)
+
         return render_template('index.html', stock_data_list=stock_data_list, historical_data=historical_data, symbol=search_symbol)
 
     else:
         # Initial page load with all stocks
         for symbol in available_stocks:
+          
+            ###################################################
+            # uncomment these codes if it is 
+            # using "try" function to check the stock data available or not,
+            # and store them into the MongoDB Compass
             try:
                 stock_data = get_stock_data(symbol)
                 if stock_data:
-                    stock_data_list.append(stock_data)
+                    #################################
+                    # store the stock data into MongoDB Compass
+                    x = myStockDB2Week.insert_one(get_historical_stock_data(symbol))    # store 2 week data
+                    y = myStockDBDaily.insert_one(get_stock_data(symbol))   # store daily data
+                    #################################
+                else:
+                    break
+
             except AlphaVantageApiException as e:
                 print(e)
+            ###################################################
+          
+            
+            ###################################################
+            try:
+                # read data from MongoDB Compass 
+                onlineStockDailyData = myStockDBDaily.find_one({"symbol": symbol})  # read daily data
+                if onlineStockDailyData:
+                    # put daily data into list
+                    stock_data_list.append(onlineStockDailyData)
+                else:
+                    break
 
+            except AlphaVantageApiException as e:
+                print(e) 
+            ###################################################
+ 
     return render_template('index.html', stock_data_list=stock_data_list)
 
 
