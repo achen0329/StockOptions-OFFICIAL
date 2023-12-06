@@ -115,7 +115,7 @@ def get_historical_stock_data(symbol):
         'symbol': symbol,
         'apikey': ALPHA_VANTAGE_API_KEY,
         'outputsize': 'full'
-    }
+
 
     response = requests.get(base_url, params=params)
     
@@ -146,17 +146,21 @@ def get_historical_stock_data(symbol):
 
 
 
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     stock_data_list = []
     historical_data = None
     search_symbol = None  # Initialize the variable
+
     
     # reload the first page of the flask to get all stock deaily data
+
     if request.method == 'POST':
         if 'reload' in request.form:
             # Reload all stocks
             for symbol in available_stocks:
+
                 ###################################################
                 try:
                     # read data from MongoDB Compass 
@@ -170,11 +174,13 @@ def index():
                 except AlphaVantageApiException as e:
                     print(e)
                 ###################################################
+
         else:
             # Search for specific stock symbol
             search_symbol = request.form.get('search_symbol').upper()
             if search_symbol in available_stocks:
                 try:
+
                     ###################################################
                     # Fetch historical data for the specific stock symbol
                     historical_data = myStockDB2Week.find_one({"symbol": search_symbol})    # from MongoDB Compass data
@@ -188,6 +194,7 @@ def index():
     else:
         # Initial page load with all stocks
         for symbol in available_stocks:
+
           
             ###################################################
             # uncomment these codes if it is 
@@ -223,6 +230,7 @@ def index():
                 print(e) 
             ###################################################
  
+
     return render_template('index.html', stock_data_list=stock_data_list)
 
 
