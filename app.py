@@ -146,41 +146,35 @@ def get_historical_stock_data(symbol):
 
 
 
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     stock_data_list = []
     historical_data = None
     search_symbol = None  # Initialize the variable
-
     
     # reload the first page of the flask to get all stock deaily data
-
     if request.method == 'POST':
+        # Reload all stocks
         if 'reload' in request.form:
-            # Reload all stocks
             for symbol in available_stocks:
-
                 ###################################################
                 try:
                     # read data from MongoDB Compass 
                     onlineStockDailyData = myStockDBDaily.find_one({"symbol": symbol})  # read daily data
-                    if onlineStockDailyData:
-                        # put daily data into list
-                        stock_data_list.append(onlineStockDailyData)
-                    else:
-                        break
+
+                    # put daily data into list, even thought the stock symbol data is deleted(missed) on the MongoDB Compass,
+                    # if the stock symbol data is deleted(missed) on the MongoDB Compass, the flask shows the empty slot 
+                    # but the rest of the stock symbol data will be shown 
+                    stock_data_list.append(onlineStockDailyData)
 
                 except AlphaVantageApiException as e:
                     print(e)
                 ###################################################
-
         else:
             # Search for specific stock symbol
             search_symbol = request.form.get('search_symbol').upper()
             if search_symbol in available_stocks:
                 try:
-
                     ###################################################
                     # Fetch historical data for the specific stock symbol
                     historical_data = myStockDB2Week.find_one({"symbol": search_symbol})    # from MongoDB Compass data
@@ -194,43 +188,41 @@ def index():
     else:
         # Initial page load with all stocks
         for symbol in available_stocks:
-
-          
+           
             ###################################################
             # uncomment these codes if it is 
             # using "try" function to check the stock data available or not,
             # and store them into the MongoDB Compass
             try:
                 stock_data = get_stock_data(symbol)
+
+                # if the stock symbol data is not "None" from the API, then store them into the MongoDB Compass
                 if stock_data:
                     #################################
                     # store the stock data into MongoDB Compass
                     x = myStockDB2Week.insert_one(get_historical_stock_data(symbol))    # store 2 week data
                     y = myStockDBDaily.insert_one(get_stock_data(symbol))   # store daily data
                     #################################
-                else:
-                    break
 
             except AlphaVantageApiException as e:
                 print(e)
             ###################################################
-          
+           
             
             ###################################################
             try:
                 # read data from MongoDB Compass 
                 onlineStockDailyData = myStockDBDaily.find_one({"symbol": symbol})  # read daily data
-                if onlineStockDailyData:
-                    # put daily data into list
-                    stock_data_list.append(onlineStockDailyData)
-                else:
-                    break
+
+                # put daily data into list, even thought the stock symbol data is deleted(missed) on the MongoDB Compass,
+                # if the stock symbol data is deleted(missed) on the MongoDB Compass, the flask shows the empty slot 
+                # but the rest of the stock symbol data will be shown 
+                stock_data_list.append(onlineStockDailyData)
 
             except AlphaVantageApiException as e:
                 print(e) 
             ###################################################
  
-
     return render_template('index.html', stock_data_list=stock_data_list)
 
 
