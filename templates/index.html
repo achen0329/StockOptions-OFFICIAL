@@ -86,23 +86,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if not stock_data_list %}
-                        <tr>
-                            <td colspan="10">No Results or Invalid Symbol.</td>
-                        </tr>
-                    {% else %}
+                    {% if stock_data_list %}
                         {% for stock in stock_data_list %}
-                            <tr>
-                                <td>{{ stock.date }}</td>
-                                <td>{{ stock.symbol }}</td>
-                                <td>{{ stock.open }}</td>
-                                <td>{{ stock.high }}</td>
-                                <td>{{ stock.low }}</td>
-                                <td>{{ stock.close }}</td>
-                                <td>{{ stock.current_price }}</td>
-                                <td>{{ stock.two_week_average }}</td>
-                            </tr>
+                            {% if stock.date and stock.symbol and stock.open and stock.high and stock.low and stock.close and stock.current_price and stock.two_week_average %}
+                                <tr>
+                                    <td>{{ stock.date }}</td>
+                                    <td>{{ stock.symbol }}</td>
+                                    <td>{{ stock.open }}</td>
+                                    <td>{{ stock.high }}</td>
+                                    <td>{{ stock.low }}</td>
+                                    <td>{{ stock.close }}</td>
+                                    <td>{{ stock.current_price }}</td>
+                                    <td>{{ stock.two_week_average }}</td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
+                    {% else %}
+                        <!-- No data message removed to not display the row for missing records -->
                     {% endif %}
                 </tbody>
             </table>
