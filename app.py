@@ -4,20 +4,6 @@ from datetime import datetime, timedelta
 from config import ALPHA_VANTAGE_API_KEY
 from repos.exceptions import AlphaVantageApiException  # Import the exception class
 
-###################################################
-# Stock real time data to MongonDB Compass
-import pymongo
-
-myClient = pymongo.MongoClient("mongodb://localhost:27017/")
-myStockDBName = myClient["stockDataBase"]
-
-myStockDB2Week = myStockDBName["historical2WeekData"]
-myStockDBDaily = myStockDBName["dailyData"]
-
-# End of Stock real time data to MongonDB Compass
-###################################################
-
-
 app = Flask(__name__)
 
 # Define the available stocks to be displayed
@@ -70,14 +56,23 @@ def get_stock_data(symbol):
     data = response.json()
     time_series = data.get('Time Series (Daily)', {})
 
-    # Get the most recent date from the time series
-    sorted_dates = sorted(time_series.keys(), reverse=True)
-    most_recent_date = sorted_dates[0]
+    # Function to get the last weekday
+    def get_last_weekday(date):
+        while date.weekday() > 4:  # Mon-Fri are 0-4
+            date -= timedelta(days=1)
+        return date
 
-    if most_recent_date in time_series:
-        daily_data = time_series[most_recent_date]
+    last_weekday = get_last_weekday(datetime.now() - timedelta(days=1))
+
+    # Check for the last available data
+    while last_weekday.strftime('%Y-%m-%d') not in time_series:
+        last_weekday = get_last_weekday(last_weekday - timedelta(days=1))
+
+    last_date_str = last_weekday.strftime('%Y-%m-%d')
+    if last_date_str in time_series:
+        daily_data = time_series[last_date_str]
         flattened_data = {
-            'date': most_recent_date,
+            'date': last_date_str,
             'symbol': symbol,
             'open': round(float(daily_data.get('1. open')), 2),
             'high': round(float(daily_data.get('2. high')), 2),
@@ -85,19 +80,19 @@ def get_stock_data(symbol):
             'close': round(float(daily_data.get('4. close')), 2),
         }
 
-        # Call get_stock_data_for_two_weeks to get data for the two-week average
+        # Now call get_stock_data_for_two_weeks to get data for the two-week average
         two_weeks_data = get_stock_data_for_two_weeks(symbol)
         current_price = round(float(two_weeks_data[0]['4. close']), 2)
         two_week_average = round(calculate_two_week_average(two_weeks_data), 2)
-
-        # Append the current price and two-week average to the flattened data
+    
+        
+        # Now append the current price and two-week average to the flattened data
         flattened_data['current_price'] = current_price
         flattened_data['two_week_average'] = two_week_average
-
+        
         return flattened_data
     else:
         return None
-
 
 def get_historical_stock_data(symbol):
     base_url = 'https://www.alphavantage.co/query'
@@ -142,103 +137,38 @@ def index():
     stock_data_list = []
     historical_data = None
     search_symbol = None  # Initialize the variable
-    
-    # reload the first page of the flask to get all stock deaily data
+
     if request.method == 'POST':
-        # Reload all stocks
         if 'reload' in request.form:
+            # Reload all stocks
             for symbol in available_stocks:
-                ###################################################
                 try:
-                    # read data from MongoDB Compass 
-                    onlineStockDailyData = myStockDBDaily.find_one({"symbol": symbol})  # read daily data
-
-                    # put daily data into list, even thought the stock symbol data is deleted(missed) on the MongoDB Compass,
-                    # if the stock symbol data is deleted(missed) on the MongoDB Compass, the flask shows the empty slot 
-                    # but the rest of the stock symbol data will be shown 
-                    stock_data_list.append(onlineStockDailyData)
-
+                    stock_data = get_stock_data(symbol)
+                    if stock_data:
+                        stock_data_list.append(stock_data)
                 except AlphaVantageApiException as e:
                     print(e)
-                ###################################################
         else:
             # Search for specific stock symbol
             search_symbol = request.form.get('search_symbol').upper()
             if search_symbol in available_stocks:
                 try:
-                    ###################################################
                     # Fetch historical data for the specific stock symbol
-                    historical_data = myStockDB2Week.find_one({"symbol": search_symbol})    # from MongoDB Compass data
-                    ###################################################
-
+                    historical_data = get_historical_stock_data(search_symbol)
                 except AlphaVantageApiException as e:
                     print(e)
-
         return render_template('index.html', stock_data_list=stock_data_list, historical_data=historical_data, symbol=search_symbol)
 
     else:
         # Initial page load with all stocks
         for symbol in available_stocks:
-           
-            ###################################################
-            # uncomment these codes if it is 
-            # using "try" function to check the stock data available or not,
-            # and store them into the MongoDB Compass
             try:
                 stock_data = get_stock_data(symbol)
-
-                # if the stock symbol data is not "None" from the API, then store them into the MongoDB Compass
                 if stock_data:
-                    #################################
-                    # store the stock data into MongoDB Compass
-                    x = myStockDB2Week.insert_one(get_historical_stock_data(symbol))    # store 2 week data
-
-                    """
-                    historical_data_with_averages = {
-                        'symbol': symbol,
-                        'data': last_10_days_data,
-                        'current_price': current_price,
-                        'two_week_average': two_week_average
-                    }
-                    """
-
-                    y = myStockDBDaily.insert_one(get_stock_data(symbol))   # store daily data
-
-                    """
-                    flattened_data = {
-                        'date': last_date_str,
-                        'symbol': symbol,
-                        'open': round(float(daily_data.get('1. open')), 2),
-                        'high': round(float(daily_data.get('2. high')), 2),
-                        'low': round(float(daily_data.get('3. low')), 2),
-                        'close': round(float(daily_data.get('4. close')), 2),
-                        'current_price': current_price,
-                        'two_week_average': two_week_average
-                    }
-                    """
-
-            
-                    #################################
-
+                    stock_data_list.append(stock_data)
             except AlphaVantageApiException as e:
                 print(e)
-            ###################################################
-           
-            
-            ###################################################
-            try:
-                # read data from MongoDB Compass 
-                onlineStockDailyData = myStockDBDaily.find_one({"symbol": symbol})  # read daily data
 
-                # put daily data into list, even thought the stock symbol data is deleted(missed) on the MongoDB Compass,
-                # if the stock symbol data is deleted(missed) on the MongoDB Compass, the flask shows the empty slot 
-                # but the rest of the stock symbol data will be shown 
-                stock_data_list.append(onlineStockDailyData)
-
-            except AlphaVantageApiException as e:
-                print(e) 
-            ###################################################
- 
     return render_template('index.html', stock_data_list=stock_data_list)
 
 
