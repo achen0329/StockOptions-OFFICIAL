@@ -50,19 +50,21 @@
                          </tr>
                      {% endfor %}
                      <!-- Summary Statistics -->
+                    <!-- Summary Statistics -->
                     <tr class="summary-statistics-heading">
                         <td colspan="5">Summary Statistics</td>
                     </tr>
-                     <tr>
-                         <td colspan="4">Current Price</td>
-                         <!-- Ensure current_price is a float before applying round filter -->
-                         <td>{{ historical_data['current_price']|float|round(2) }}</td>
-                     </tr>
-                     <tr>
-                         <td colspan="4">Two Week Average</td>
-                         <!-- Ensure two_week_average is a float before applying round filter -->
-                         <td>{{ historical_data['two_week_average']|float|round(2) }}</td>
-                     </tr>
+                    <tr class="summary-statistics-data">
+                        <!-- colspan reduced to 1 to align with 'Date' -->
+                        <td>Current Price</td>
+                        <td colspan="4">{{ historical_data['current_price']|float|round(2) }}</td>
+                    </tr>
+                    <tr class="summary-statistics-data">
+                        <!-- colspan reduced to 1 to align with 'Date' -->
+                        <td>Two Week Average</td>
+                        <td colspan="4">{{ historical_data['two_week_average']|float|round(2) }}</td>
+                    </tr>
+  
                  </tbody>
              </table>
          </div>
@@ -71,41 +73,43 @@
         {% elif stock_data_list %}
         <div class="table-1">
             <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Symbol</th>
-                        <th>Open</th>
-                        <th>High</th>
-                        <th>Low</th>
-                        <th>Close</th>
-                        <th>Current Price</th>
-                        <th>Two Week Average</th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if stock_data_list %}
-                        {% for stock in stock_data_list %}
-                            {% if stock.date and stock.symbol and stock.open and stock.high and stock.low and stock.close and stock.current_price and stock.two_week_average %}
-                                <tr>
-                                    <td>{{ stock.date }}</td>
-                                    <td>{{ stock.symbol }}</td>
-                                    <td>{{ stock.open }}</td>
-                                    <td>{{ stock.high }}</td>
-                                    <td>{{ stock.low }}</td>
-                                    <td>{{ stock.close }}</td>
-                                    <td>{{ stock.current_price }}</td>
-                                    <td>{{ stock.two_week_average }}</td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <!-- No data message removed to not display the row for missing records -->
+              <thead>
+                <tr>
+                  <th>#</th> <!-- Add a header for the row numbers -->
+                  <th>Date</th>
+                  <th>Symbol</th>
+                  <th>Open</th>
+                  <th>High</th>
+                  <th>Low</th>
+                  <th>Close</th>
+                  <th>Current Price</th>
+                  <th>Two Week Average</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if stock_data_list %}
+                  {% for stock in stock_data_list %}
+                    {% if stock.date and stock.symbol and stock.open and stock.high and stock.low and stock.close and stock.current_price and stock.two_week_average %}
+                      <tr>
+                        <td>{{ loop.index }}</td> <!-- Add the row number -->
+                        <td>{{ stock.date }}</td>
+                        <td>{{ stock.symbol }}</td>
+                        <td>{{ stock.open }}</td>
+                        <td>{{ stock.high }}</td>
+                        <td>{{ stock.low }}</td>
+                        <td>{{ stock.close }}</td>
+                        <td>{{ stock.current_price }}</td>
+                        <td>{{ stock.two_week_average }}</td>
+                      </tr>
                     {% endif %}
-                </tbody>
+                  {% endfor %}
+                {% else %}
+                  <!-- No data message removed to not display the row for missing records -->
+                {% endif %}
+              </tbody>
             </table>
-        </div>
+          </div>
+          
 
         {% else %}
             <!-- No data available -->
