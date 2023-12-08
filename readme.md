@@ -12,15 +12,23 @@
 
 
 
-    From a Windows operating system one can download the repository and follow the following steps to get started:
+   From a Windows operating system one can download the repository and follow the following steps to get started:
 
-    1. py -3 -m venv env
-    2. env\scripts\activate
-    3. python -m pip install -r requirements.txt
-    4. flask run
+   1. py -3 -m venv env
+   2. env\scripts\activate
+   3. python -m pip install -r requirements.txt
+   4. flask run
 
-    Once a user initializes a virtual environment for the project, they will need to activate it. Within this virtual environment the dependencies for the project will be installed and a user can then run the flask application.
+   Equivalently the commands for Mac:
 
-    In addition a user will need to register for a free API key at Alpha Vantage's website to enable the API integrations: https://www.alphavantage.co/support/#api-key
+   1. python3 -m venv env
+   2. source env/bin/activate
+   3. pip install -r requirements.txt
+   4. FLASK_APP=app.py FLASK_ENV=development flask run
 
-    Future work for the project includes cloud deployment for scaling the product and implementing CI/CD processes for automatic database updates.
+
+   Once a user initializes a virtual environment for the project, they will need to activate it. Within this virtual environment the dependencies for the project will be installed and a user can then run the flask application.
+
+   In addition a user will need to register for a free API key at Alpha Vantage's website to enable the API integrations: https://www.alphavantage.co/support/#api-key
+
+   Future work for the project includes cloud deployment for scaling the product and implementing CI/CD processes for automatic database updates.
