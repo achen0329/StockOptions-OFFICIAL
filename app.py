@@ -70,23 +70,14 @@ def get_stock_data(symbol):
     data = response.json()
     time_series = data.get('Time Series (Daily)', {})
 
-    # Function to get the last weekday
-    def get_last_weekday(date):
-        while date.weekday() > 4:  # Mon-Fri are 0-4
-            date -= timedelta(days=1)
-        return date
+    # Get the most recent date from the time series
+    sorted_dates = sorted(time_series.keys(), reverse=True)
+    most_recent_date = sorted_dates[0]
 
-    last_weekday = get_last_weekday(datetime.now() - timedelta(days=1))
-
-    # Check for the last available data
-    while last_weekday.strftime('%Y-%m-%d') not in time_series:
-        last_weekday = get_last_weekday(last_weekday - timedelta(days=1))
-
-    last_date_str = last_weekday.strftime('%Y-%m-%d')
-    if last_date_str in time_series:
-        daily_data = time_series[last_date_str]
+    if most_recent_date in time_series:
+        daily_data = time_series[most_recent_date]
         flattened_data = {
-            'date': last_date_str,
+            'date': most_recent_date,
             'symbol': symbol,
             'open': round(float(daily_data.get('1. open')), 2),
             'high': round(float(daily_data.get('2. high')), 2),
@@ -94,19 +85,19 @@ def get_stock_data(symbol):
             'close': round(float(daily_data.get('4. close')), 2),
         }
 
-        # Now call get_stock_data_for_two_weeks to get data for the two-week average
+        # Call get_stock_data_for_two_weeks to get data for the two-week average
         two_weeks_data = get_stock_data_for_two_weeks(symbol)
         current_price = round(float(two_weeks_data[0]['4. close']), 2)
         two_week_average = round(calculate_two_week_average(two_weeks_data), 2)
-    
-        
-        # Now append the current price and two-week average to the flattened data
+
+        # Append the current price and two-week average to the flattened data
         flattened_data['current_price'] = current_price
         flattened_data['two_week_average'] = two_week_average
-        
+
         return flattened_data
     else:
         return None
+
 
 def get_historical_stock_data(symbol):
     base_url = 'https://www.alphavantage.co/query'
@@ -201,7 +192,32 @@ def index():
                     #################################
                     # store the stock data into MongoDB Compass
                     x = myStockDB2Week.insert_one(get_historical_stock_data(symbol))    # store 2 week data
+
+                    """
+                    historical_data_with_averages = {
+                        'symbol': symbol,
+                        'data': last_10_days_data,
+                        'current_price': current_price,
+                        'two_week_average': two_week_average
+                    }
+                    """
+
                     y = myStockDBDaily.insert_one(get_stock_data(symbol))   # store daily data
+
+                    """
+                    flattened_data = {
+                        'date': last_date_str,
+                        'symbol': symbol,
+                        'open': round(float(daily_data.get('1. open')), 2),
+                        'high': round(float(daily_data.get('2. high')), 2),
+                        'low': round(float(daily_data.get('3. low')), 2),
+                        'close': round(float(daily_data.get('4. close')), 2),
+                        'current_price': current_price,
+                        'two_week_average': two_week_average
+                    }
+                    """
+
+            
                     #################################
 
             except AlphaVantageApiException as e:
