@@ -36,37 +36,36 @@
                          <th>High</th>
                          <th>Low</th>
                          <th>Close</th>
-                         <!-- No need for Current Price and Two Week Average in the header as they're not part of the loop -->
                      </tr>
                  </thead>
                  <tbody>
                      {% for date, data in historical_data['data'].items() %}
                          <tr>
                              <td>{{ date }}</td>
-                             <td>{{ data['1. open'] }}</td>
-                             <td>{{ data['2. high'] }}</td>
-                             <td>{{ data['3. low'] }}</td>
-                             <td>{{ data['4. close'] }}</td>
+                             <!-- Convert to float and apply rounding with Jinja's round filter -->
+                             <td>{{ data['1. open']|float|round(2) }}</td>
+                             <td>{{ data['2. high']|float|round(2) }}</td>
+                             <td>{{ data['3. low']|float|round(2) }}</td>
+                             <td>{{ data['4. close']|float|round(2) }}</td>
                          </tr>
                      {% endfor %}
-                     <!-- Subheading for Summary Statistics -->
+                     <!-- Summary Statistics -->
                     <tr class="summary-statistics-heading">
                         <td colspan="5">Summary Statistics</td>
                     </tr>
-                     
-                     
                      <tr>
                          <td colspan="4">Current Price</td>
-                         <td>{{ historical_data['current_price'] }}</td>
+                         <!-- Ensure current_price is a float before applying round filter -->
+                         <td>{{ historical_data['current_price']|float|round(2) }}</td>
                      </tr>
                      <tr>
                          <td colspan="4">Two Week Average</td>
-                         <td>{{ historical_data['two_week_average'] }}</td>
+                         <!-- Ensure two_week_average is a float before applying round filter -->
+                         <td>{{ historical_data['two_week_average']|float|round(2) }}</td>
                      </tr>
                  </tbody>
              </table>
          </div>
-       
        
 
         {% elif stock_data_list %}
