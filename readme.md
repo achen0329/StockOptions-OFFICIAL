@@ -10,8 +10,6 @@
 
 
 
-
-
    From a Windows operating system one can download the repository and follow the following steps to get started:
 
    1. py -3 -m venv env
@@ -32,3 +30,6 @@
    In addition a user will need to register for a free API key at Alpha Vantage's website to enable the API integrations: https://www.alphavantage.co/support/#api-key
 
    Future work for the project includes cloud deployment for scaling the product and implementing CI/CD processes for automatic database updates.
+
+
+   [![Watch the video](app_screenshots/StockOptions - OFFICIAL Home.png)](https://youtu.be/zWeYYhJ2OS4)
