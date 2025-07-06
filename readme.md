@@ -4,7 +4,6 @@
 [![Watch the video](app_screenshots/StockOptions%20-%20OFFICIAL%20Home.png)](https://youtu.be/zWeYYhJ2OS4)
 
 
-
    From a Windows operating system one can download the repository and follow the following steps to get started:
 
    1. py -3 -m venv env
@@ -26,3 +25,5 @@
 
    Future work for the project includes cloud deployment for scaling the product and implementing CI/CD processes for automatic database updates.
 
+
+   [![Watch the video](app_screenshots/StockOptions - OFFICIAL Home.png)](https://youtu.be/zWeYYhJ2OS4)
