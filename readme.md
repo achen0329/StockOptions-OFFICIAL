@@ -1,12 +1,7 @@
     
    StockPulse is the premier stock price application for all your investment needs designed to deliver both current and historical stock data. StockPulse provides a a delightful end user experince through its cutting-edge SPA design fully integrated with the Alpha Vantage API and a DB connection for lightning fast response times. Users will be equipped with the current and historical stock market data they need to make informed financial decisions. Here's how to get started (below).
 
-![Alt text](<app_screenshots/StockOptions - OFFICIAL Home.png> "Initial App Rendering")
-
-
-
-
-![Alt text](<app_screenshots/StockOptions - OFFICIAL Search.png> "Search Results")
+[![Watch the video](app_screenshots/StockOptions%20-%20OFFICIAL%20Home.png)](https://youtu.be/zWeYYhJ2OS4)
 
 
 
@@ -31,5 +26,3 @@
 
    Future work for the project includes cloud deployment for scaling the product and implementing CI/CD processes for automatic database updates.
 
-
-   [![Watch the video](app_screenshots/StockOptions - OFFICIAL Home.png)](https://youtu.be/zWeYYhJ2OS4)
